@@ -1,8 +1,8 @@
 import datetime
-import pygal
 import time
 import pandas as pd
 from webbrowser import get
+from alpha_vantage.timeseries import TimeSeries
 
 class DateError(Exception):
     pass
@@ -124,6 +124,8 @@ def generateChart():
 
 
 def main():
+    key = 'SJ11I1BHEDRFJ1B6' # api key
+
     symbolChoice = fetchSymbol()
     chartChoice = chartType()
     startDateChoice = startDate()
