@@ -1,6 +1,7 @@
 import datetime
 import time
 import pandas as pd
+import pygal as pg
 from webbrowser import get
 from alpha_vantage.timeseries import TimeSeries
 
@@ -104,7 +105,7 @@ def generateChart():
     c = []
     d = []
 
-    line_chart = pygal.Line()
+    line_chart = pg.Line()
     #titles 
     line_chart_title = 'Open, High, Low and Close'
     #range of months 1 to 12
