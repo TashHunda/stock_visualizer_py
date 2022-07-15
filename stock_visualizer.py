@@ -2,22 +2,30 @@ from ast import Lambda
 import time
 import pandas as pd
 import pygal as pg
-#Doesn't seem like these are needed
-# from webbrowser import get 
-# from alpha_vantage.timeseries import TimeSeries 
 
 def fetchSymbol():
     userChoice = input("Enter the stock symbol you are looking for: ")
     return userChoice
 
-def chartType():
-    print("Chart Types:")
-    print("------------")
-    print("1. Bar")
-    print("2. Line")
-    chart_type = input("Choose what type of chart you want (1, 2): ")
-    return chart_type
 
+def chartType():
+    while True:
+        try:
+            print("Chart Types:")
+            print("------------")
+            print("1. Bar")
+            print("2. Line")
+            chart_type = int(input("Choose what type of chart you want (1, 2): "))
+            if chart_type != 1 and chart_type != 2:
+                print("\nError: Please only enter 1 or 2\n")
+                continue
+        except ValueError:
+                print("\nError: Please only enter 1 or 2\n")
+                continue
+        else:
+            return chart_type
+
+        
 def get_time_series(symbol):
     while True:
         try: 
@@ -42,6 +50,7 @@ def get_time_series(symbol):
         else:
             return userChoiceArray
 
+        
 def dateFormatCheck(date):
     
     #check if given date is numerical
@@ -73,6 +82,7 @@ def dateFormatCheck(date):
         print("Date cannot be after today.")
         return getDates()
 
+    
 def getDates():
     #begin date
     beginDate = input("Please enter the start date (YYYY-MM-DD) format: ")
@@ -90,6 +100,7 @@ def getDates():
 
     return datesArray
 
+
 def api(condition, datesArray):
 
     key = 'SJ11I1BHEDRFJ1B6' # api key
@@ -98,7 +109,7 @@ def api(condition, datesArray):
         case "1":
             intraInterval = condition[1]
             intraday = "TIME_SERIES_INTRADAY"
-            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}min&apikey={key}&datatype=csv"
             generateChart(url)
         case "2":
             daily = "TIME_SERIES_DAILY"
@@ -117,6 +128,7 @@ def api(condition, datesArray):
             print("Error occured. Please try again.")
             main()
 
+            
 def generateChart(url):
     data_frame = pd.read_csv(url)
     data_frame.head
