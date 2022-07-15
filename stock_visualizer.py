@@ -25,6 +25,7 @@ def chartType():
         else:
             return chart_type
 
+        
 def get_time_series(symbol):
     while True:
         try: 
