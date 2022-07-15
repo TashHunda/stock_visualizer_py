@@ -26,29 +26,30 @@ def chartType():
             return chart_type
 
         
-def get_time_series(symbol):
+def get_time_series():
     while True:
         try: 
-            intervalOption = Lambda
+            interval = Lambda
             print("Select the Time Series of the chart you want to Generate")
             print("1. Intraday")
             print("2. Daily")
             print("3. Weekly")
             print("4. Monthly")
-            timeSeries = input("Enter the time series option(1,2,3,4): ")
-            if timeSeries == "1":
+            series = input("Enter the time series option(1,2,3,4): ")
+            if series == "1":
                 print("\n\n1. 1min")
                 print("2. 5min")
                 print("3. 15min")
                 print("4. 30min")
                 print("5. 60min")
-                intervalOption = input("Please choose time interval: ")
-            userChoiceArray = [timeSeries, intervalOption, symbol]
+                interval = input("Please choose time interval: ")
+            timeSeriesObject = {"series": series,
+                                "interval": interval}
         except ValueError:
             print("This is an unacceptable response, enter a valid value")
             continue
         else:
-            return userChoiceArray
+            return timeSeriesObject
 
         
 def dateFormatCheck(date):
@@ -101,27 +102,27 @@ def getDates():
     return datesArray
 
 
-def api(condition, datesArray):
+def api(userObject):
 
     key = 'SJ11I1BHEDRFJ1B6' # api key
-
-    match condition[0]:
+    symbol = userObject["symbol"]
+    match userObject["timeSeriesObject"]["series"]:
         case "1":
-            intraInterval = condition[1]
+            intraInterval = userObject["timeSeriesObject"]["interval"]
             intraday = "TIME_SERIES_INTRADAY"
-            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}min&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={symbol}&interval={intraInterval}min&apikey={key}&datatype=csv"
             generateChart(url)
         case "2":
             daily = "TIME_SERIES_DAILY"
-            url = f"https://www.alphavantage.co/query?function={daily}&symbol={condition[2]}&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={daily}&symbol={symbol}&apikey={key}&datatype=csv"
             generateChart(url)
         case "3":
             weekly = "TIME_SERIES_WEEKLY"
-            url = f"https://www.alphavantage.co/query?function={weekly}&symbol={condition[2]}&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={weekly}&symbol={symbol}&apikey={key}&datatype=csv"
             generateChart(url)
         case "4":
             monthly = "TIME_SERIES_MONTHLY"
-            url = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={monthly}&symbol={symbol}&apikey={key}&datatype=csv"
             generateChart(url)
             # url2 = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&start.date=%7BstartDate%7D&end.date=%7BgetEndDate%7D&inte&apikey=%7BBSJ11I1BHEDRFJ1B6%7D"
         case _:
@@ -166,15 +167,26 @@ def generateChart(url):
     line_chart.add('close', d)
     #file render
     line_chart.render_in_browser()
+    
+
+def createUserObject():
+    symbol = fetchSymbol()
+    chart = chartType()
+    timeSeriesObject = get_time_series()
+    datesArray = getDates()
+
+    userObject = {"symbol": symbol,
+                "chart": chart,
+                "timeSeriesObject": timeSeriesObject,
+                "datesObject": datesArray}
+    # print(userObject) don't need in future, just checking everything is correct
+    return userObject
 
 
 def main():
     while True:
-        symbol = fetchSymbol()
-        chartChoice = chartType()
-        userChoiceArray = get_time_series(symbol)
-        datesArray = getDates()
-        api(userChoiceArray, datesArray)
+        userObject = createUserObject()
+        api(userObject)
 
         runAgain = input("Would you like to view more stock data? (y/n): ")
         if runAgain.lower() != 'y':
