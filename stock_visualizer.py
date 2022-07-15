@@ -110,7 +110,7 @@ def api(condition, datesArray):
             generateChart(url)
         case "4":
             monthly = "TIME_SERIES_MONTHLY"
-            url = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&start.date={datesArray[0]}&end.date={datesArray[1]}&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&apikey={key}&datatype=csv"
             generateChart(url)
             # url2 = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&start.date=%7BstartDate%7D&end.date=%7BgetEndDate%7D&inte&apikey=%7BBSJ11I1BHEDRFJ1B6%7D"
         case _:
@@ -141,7 +141,7 @@ def generateChart(url):
     #titles 
     line_chart_title = 'Open, High, Low and Close'
     #range of months 1 to 12
-    line_chart.x_labels = map(str, "date")
+    line_chart.x_labels = map(str, range(2002, 208))
     for index, row in data_frame.iterrows():
         a.append(row["open"])
         b.append(row["high"])
