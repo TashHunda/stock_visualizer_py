@@ -1,18 +1,14 @@
-import datetime
+from ast import Lambda
 import time
 import pandas as pd
 import pygal as pg
-from webbrowser import get
-from alpha_vantage.timeseries import TimeSeries
-
-class DateError(Exception):
-    pass
-
+#Doesn't seem like these are needed
+# from webbrowser import get 
+# from alpha_vantage.timeseries import TimeSeries 
 
 def fetchSymbol():
     userChoice = input("Enter the stock symbol you are looking for: ")
     return userChoice
-
 
 def chartType():
     print("Chart Types:")
@@ -22,18 +18,42 @@ def chartType():
     chart_type = input("Choose what type of chart you want (1, 2): ")
     return chart_type
 
+def get_time_series(symbol):
+    while True:
+        try: 
+            intervalOption = Lambda
+            print("Select the Time Series of the chart you want to Generate")
+            print("1. Intraday")
+            print("2. Daily")
+            print("3. Weekly")
+            print("4. Monthly")
+            timeSeries = input("Enter the time series option(1,2,3,4): ")
+            if timeSeries == "1":
+                print("\n\n1. 1min")
+                print("2. 5min")
+                print("3. 15min")
+                print("4. 30min")
+                print("5. 60min")
+                intervalOption = input("Please choose time interval: ")
+            userChoiceArray = [timeSeries, intervalOption, symbol]
+        except ValueError:
+            print("This is an unacceptable response, enter a valid value")
+            continue
+        else:
+            return userChoiceArray
 
-def dateFormatCheck(userDate):
+def dateFormatCheck(date):
+    
     #check if given date is numerical
-    ymd = userDate.split("-")
+    ymd = date.split("-")
     if len(ymd) != 3:
         print("Please use the correct format(YYYY-MM-DD).")
-        return startDate()
+        return getDates()
 
     for digit in ymd:
         if not digit.isdigit():
             print("Please enter numerical values only.")
-            return startDate()
+            return getDates()
 
     #check if variables are valid in length and value
     year = ymd[0]
@@ -41,55 +61,67 @@ def dateFormatCheck(userDate):
     day = ymd[2]
     if len(year) != 4 or len(month) != 2 or len(day) != 2:
         print("Please make sure date is in \"YYYY-MM-DD\" format.")
-        return startDate()
+        return getDates()
     if int(month) > 12 or int(day) > 31:
         print("Please enter a valid Month/Day")
-        return startDate()
+        return getDates()
 
     #check if user time is in the future
-    userTime = time.strptime(userDate, "%Y-%m-%d")
+    userTime = time.strptime(date, "%Y-%m-%d")
     currentTime = time.strptime(time.strftime("%Y-%m-%d"), "%Y-%m-%d")
     if userTime > currentTime:
         print("Date cannot be after today.")
-        return startDate()
+        return getDates()
 
+def getDates():
+    #begin date
+    beginDate = input("Please enter the start date (YYYY-MM-DD) format: ")
 
-def startDate():
-    userDate = input("Enter the start date (YYYY-MM-DD): ")
-    dateFormatCheck(userDate)
-    return userDate
+    #end date
+    endDate = input("Please enter the end date (YYYY-MM-DD) format: ")
+    if endDate <= beginDate:
+        print("The ending date must not be before the beginning date. \nPlease try again.")
+        getDates()
 
+    #date format check
+    datesArray = [beginDate, endDate]
+    for date in datesArray:
+        dateFormatCheck(date)
 
-def getEndDate():
-    begin_date = datetime.datetime.strptime('2022-07-11', '%Y-%m-%d')
-    endingDate = input("Please enter the end date of the data in YYYY-MM-DD format: ")
-    endDate = datetime.datetime.strptime(endingDate, "%Y-%m-%d")
-    if endDate <= begin_date:
-        raise DateError("The ending date must not be before the beginning date.")
-    return endDate
+    return datesArray
 
+def api(condition, datesArray):
 
-def get_time_series():
-    while True:
-        try: 
-            print("Select the Time Series of the chart you want to Generate")
-            print("1. Intraday")
-            print("2. Daily")
-            print("3. Weekly")
-            print("4. Monthly")
-            userChoice = int(input("Enter the time series option(1,2,3,4): "))
-        except ValueError:
-            print("This is an unacceptable response, enter a valid value")
-            continue
-        else:
-            return userChoice
+    key = 'SJ11I1BHEDRFJ1B6' # api key
 
+    match condition[0]:
+        case "1":
+            intraInterval = condition[1]
+            intraday = "TIME_SERIES_INTRADAY"
+            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}&apikey={key}&datatype=csv"
+            generateChart(url)
+        case "2":
+            daily = "TIME_SERIES_DAILY"
+            url = f"https://www.alphavantage.co/query?function={daily}&symbol={condition[2]}&apikey={key}&datatype=csv"
+            generateChart(url)
+        case "3":
+            weekly = "TIME_SERIES_WEEKLY"
+            url = f"https://www.alphavantage.co/query?function={weekly}&symbol={condition[2]}&apikey={key}&datatype=csv"
+            generateChart(url)
+        case "4":
+            monthly = "TIME_SERIES_MONTHLY"
+            url = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&start.date={datesArray[0]}&end.date={datesArray[1]}&apikey={key}&datatype=csv"
+            generateChart(url)
+            # url2 = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&start.date=%7BstartDate%7D&end.date=%7BgetEndDate%7D&inte&apikey=%7BBSJ11I1BHEDRFJ1B6%7D"
+        case _:
+            print("Error occured. Please try again.")
+            main()
 
-def generateChart():
-    data_frame = pd.read_csv("weekly_IBM.csv")
+def generateChart(url):
+    data_frame = pd.read_csv(url)
     data_frame.head
     #importing pandas library.
-    data_frame = pd.read_csv("weekly_IBM.csv",
+    data_frame = pd.read_csv(url,
                     dtype={
                         "date" : str,
                         "open" : float, 
@@ -125,16 +157,15 @@ def generateChart():
 
 
 def main():
-    key = 'SJ11I1BHEDRFJ1B6' # api key
 
-    symbolChoice = fetchSymbol()
+    symbol = fetchSymbol()
     chartChoice = chartType()
-    startDateChoice = startDate()
-    endDateChoice = getEndDate() # Random inputs cause a crash
-    timeSeriesChoice = get_time_series()
+    userChoiceArray = get_time_series(symbol)
+    datesArray = getDates()
+    api(userChoiceArray, datesArray)
 
     # Eventually this should take all the above stings as params
-    generateChart() # Causes a crash on Brandon's system
+    # generateChart() # Causes a crash on Brandon's system
 
 
 main()
