@@ -16,7 +16,7 @@ def chartType():
             print("1. Bar")
             print("2. Line")
             chart_type = int(input("Choose what type of chart you want (1, 2): "))
-            if chart_type != 1 or chart_type != 2:
+            if chart_type != 1 and chart_type != 2:
                 print("\nError: Please only enter 1 or 2\n")
                 continue
         except ValueError:
