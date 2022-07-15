@@ -179,12 +179,12 @@ def generateChart(url):
     bar_chart.title = "Stock Data for {userChoice}: {beginDate} to {endDate}" 
     bar_chart_title = 'Open, High, Low and Close'
     #range of months 1 to 12
-    bar_chart.x_labels = map(str, "date")
+    bar_chart.x_labels = map(str, range())
     for index, row in data_frame.iterrows():
-    a.append(row["open"])
-    b.append(row["high"])
-    c.append(row["low"])
-    d.append(row["close"])
+        a.append(row["open"])
+        b.append(row["high"])
+        c.append(row["low"])
+        d.append(row["close"])
     # adding appended list
     bar_chart.add('Open', a)
     bar_chart.add('High', b)
