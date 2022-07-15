@@ -151,6 +151,7 @@ def generateChart(url):
 
     line_chart = pg.Line()
     #titles 
+    line_chart.title = "Stock Data for {userChoice}: {beginDate} to {endDate}"
     line_chart_title = 'Open, High, Low and Close'
     #range of months 1 to 12
     line_chart.x_labels = map(str, range(2002, 208))
@@ -174,7 +175,8 @@ def generateChart(url):
     d = []
 
     bar_chart =pg.Line()
-    #titles 
+    #titles
+    bar_chart.title = "Stock Data for {userChoice}: {beginDate} to {endDate}" 
     bar_chart_title = 'Open, High, Low and Close'
     #range of months 1 to 12
     bar_chart.x_labels = map(str, "date")
