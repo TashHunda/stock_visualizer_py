@@ -155,6 +155,30 @@ def generateChart(url):
     #file render
     line_chart.render_in_browser()
 
+    #append data
+    a = []
+    b = []
+    c = []
+    d = []
+
+    bar_chart =pg.Line()
+    #titles 
+    bar_chart_title = 'Open, High, Low and Close'
+    #range of months 1 to 12
+    bar_chart.x_labels = map(str, "date")
+    for index, row in data_frame.iterrows():
+    a.append(row["open"])
+    b.append(row["high"])
+    c.append(row["low"])
+    d.append(row["close"])
+    # adding appended list
+    bar_chart.add('Open', a)
+    bar_chart.add('High', b)
+    bar_chart.add('Low', c)
+    bar_chart.add('Close', d)
+    #file render
+    bar_chart.render_in_browser()
+
 
 def main():
 
