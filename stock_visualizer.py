@@ -169,15 +169,17 @@ def generateChart(url):
 
 
 def main():
+    while True:
+        symbol = fetchSymbol()
+        chartChoice = chartType()
+        userChoiceArray = get_time_series(symbol)
+        datesArray = getDates()
+        api(userChoiceArray, datesArray)
 
-    symbol = fetchSymbol()
-    chartChoice = chartType()
-    userChoiceArray = get_time_series(symbol)
-    datesArray = getDates()
-    api(userChoiceArray, datesArray)
-
-    # Eventually this should take all the above stings as params
-    # generateChart() # Causes a crash on Brandon's system
+        runAgain = input("Would you like to view more stock data? (y/n): ")
+        if runAgain.lower() != 'y':
+            print("Goodbye!")
+            break
 
 
 main()
