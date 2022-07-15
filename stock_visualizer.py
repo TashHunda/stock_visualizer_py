@@ -4,6 +4,7 @@ import pandas as pd
 import pygal as pg
 
 def fetchSymbol():
+    print('')
     userChoice = input("Enter the stock symbol you are looking for: ")
     return userChoice
 
@@ -30,7 +31,7 @@ def get_time_series(symbol):
     while True:
         try: 
             intervalOption = Lambda
-            print("\nSelect the Time Series of the chart you want to Generate")
+            print("Select the Time Series of the chart you want to Generate")
             print("1. Intraday")
             print("2. Daily")
             print("3. Weekly")
@@ -101,7 +102,7 @@ def getDates():
     return datesArray
 
 
-def api(condition, datesArray):
+def api(condition, datesArray, chartChoice):
 
     key = 'SJ11I1BHEDRFJ1B6' # api key
 
@@ -109,30 +110,29 @@ def api(condition, datesArray):
         case "1":
             intraInterval = condition[1]
             intraday = "TIME_SERIES_INTRADAY"
-            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}&apikey={key}&datatype=csv"
-            generateChart(url)
+            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}min&apikey={key}&datatype=csv"
+            generateChart(url, chartChoice)
         case "2":
             daily = "TIME_SERIES_DAILY"
             url = f"https://www.alphavantage.co/query?function={daily}&symbol={condition[2]}&apikey={key}&datatype=csv"
-            generateChart(url)
+            generateChart(url, chartChoice)
         case "3":
             weekly = "TIME_SERIES_WEEKLY"
             url = f"https://www.alphavantage.co/query?function={weekly}&symbol={condition[2]}&apikey={key}&datatype=csv"
-            generateChart(url)
+            generateChart(url, chartChoice)
         case "4":
             monthly = "TIME_SERIES_MONTHLY"
             url = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&apikey={key}&datatype=csv"
-            generateChart(url)
+            generateChart(url, chartChoice)
             # url2 = f"https://www.alphavantage.co/query?function={monthly}&symbol={condition[2]}&start.date=%7BstartDate%7D&end.date=%7BgetEndDate%7D&inte&apikey=%7BBSJ11I1BHEDRFJ1B6%7D"
         case _:
             print("Error occured. Please try again.")
             main()
 
             
-def generateChart(url):
+def generateChart(url, chartChoice):
     data_frame = pd.read_csv(url)
     data_frame.head
-    #importing pandas library.
     data_frame = pd.read_csv(url,
                     dtype={
                         "date" : str,
@@ -142,42 +142,43 @@ def generateChart(url):
                         "close" : float
                     })
 
-    #import pygal
-    #append data
     a = []
     b = []
     c = []
     d = []
 
-    line_chart = pg.Line()
+    chart = pg.Bar() if chartChoice == 1 else pg.Line()
     #titles 
     line_chart_title = 'Open, High, Low and Close'
     #range of months 1 to 12
-    line_chart.x_labels = map(str, range(2002, 208))
+    chart.x_labels = map(str, range(2002, 208))
     for index, row in data_frame.iterrows():
         a.append(row["open"])
         b.append(row["high"])
         c.append(row["low"])
         d.append(row["close"])
     # adding appended list
-    line_chart.add('open', a)
-    line_chart.add('high', b)
-    line_chart.add('low', c)
-    line_chart.add('close', d)
+    chart.add('open', a)
+    chart.add('high', b)
+    chart.add('low', c)
+    chart.add('close', d)
     #file render
-    line_chart.render_in_browser()
+    chart.render_in_browser()
 
 
 def main():
+    while True:
+        symbol = fetchSymbol()
+        chartChoice = chartType()
+        userChoiceArray = get_time_series(symbol)
+        datesArray = getDates()
+        api(userChoiceArray, datesArray, chartChoice)
 
-    symbol = fetchSymbol()
-    chartChoice = chartType()
-    userChoiceArray = get_time_series(symbol)
-    datesArray = getDates()
-    api(userChoiceArray, datesArray)
-
-    # Eventually this should take all the above stings as params
-    # generateChart() # Causes a crash on Brandon's system
+        print('')
+        runAgain = input("Would you like to view more stock data? (y/n): ")
+        if runAgain.lower() != 'y':
+            print("Goodbye!")
+            break
 
 
 main()
