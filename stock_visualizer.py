@@ -30,7 +30,7 @@ def get_time_series(symbol):
     while True:
         try: 
             intervalOption = Lambda
-            print("Select the Time Series of the chart you want to Generate")
+            print("\nSelect the Time Series of the chart you want to Generate")
             print("1. Intraday")
             print("2. Daily")
             print("3. Weekly")
