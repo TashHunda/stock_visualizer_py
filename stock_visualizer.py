@@ -109,7 +109,7 @@ def api(condition, datesArray):
         case "1":
             intraInterval = condition[1]
             intraday = "TIME_SERIES_INTRADAY"
-            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}&apikey={key}&datatype=csv"
+            url = f"https://www.alphavantage.co/query?function={intraday}&symbol={condition[2]}&interval={intraInterval}min&apikey={key}&datatype=csv"
             generateChart(url)
         case "2":
             daily = "TIME_SERIES_DAILY"
